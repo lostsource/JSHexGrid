@@ -5,6 +5,7 @@ var HexGrid = (function(){
 	function GridSelection(start) {
 		var stop = arguments[1];
 		var oldSelection; // set onBeforeChange, sent onChange
+		var that = this;
 
 		start = (start === undefined) ? -1 : start;
 		stop = (stop === undefined) ? -1 : stop;
@@ -90,16 +91,16 @@ var HexGrid = (function(){
 		function _onbeforechange() {
 			/// TODO check closure compiler DOCS
 			/// for some reason dot notation does not work with ADVANCED_COMPILATION mode 
-			oldSelection = new GridSelection(this.getStart(),this.getStop());
+			oldSelection = new GridSelection(that.getStart(),that.getStop());
 
-			if(typeof(this.onbeforechange) == "function") {
-				this.onbeforechange.apply(this,arguments);
+			if(typeof(that.onbeforechange) == "function") {
+				that.onbeforechange.apply(that,arguments);
 			}
 		}
 
 		function _onchange() {
-			if(typeof(this.onchange) == "function") {
-				this.onchange.apply(this,[this,oldSelection]);
+			if(typeof(that.onchange) == "function") {
+				that.onchange.apply(that,[that,oldSelection]);
 			}
 		}
 	}
@@ -110,6 +111,7 @@ var HexGrid = (function(){
 			return false;
 		}
 
+		var that = this;
 		var curOffset = 0;
 		var curBuffer = false;
 		// byte or text? 
@@ -255,7 +257,7 @@ var HexGrid = (function(){
 				return false;
 			}
 
-			evHandlers[evName].apply(this,evArgs);
+			evHandlers[evName].apply(that,evArgs);
 		}
 
 		function wheelHandler(e) {
@@ -272,8 +274,10 @@ var HexGrid = (function(){
 		}
 
 		function byteMouseDownHandler(e) {
-			var type = this.getAttribute("_type"); // is this a 'byte' or a 'text' cell ?
-			var byteCell = (type == 'byte') ? this : this.parentNode.cells[this.cellIndex-16];
+			var elem = this;
+
+			var type = elem.getAttribute("_type"); // is this a 'byte' or a 'text' cell ?
+			var byteCell = (type == 'byte') ? elem : elem.parentNode.cells[elem.cellIndex-16];
 
 			var adr = getByteCellAddress(byteCell);
 			if(adr === false) {
@@ -289,7 +293,7 @@ var HexGrid = (function(){
 				}]);
 			}
 
-			if(e.button == 0) {
+			if(e.button === 0) {
 				selection.setInProgress(true);
 				selection.setStart(adr);
 				selection.setStop(adr);
@@ -313,9 +317,10 @@ var HexGrid = (function(){
 		}
 
 		function byteMouseOverHandler() {
-			var type = this.getAttribute("_type"); // is this a 'byte' or a 'text' cell ?
+			var elem = this;
+			var type = elem.getAttribute("_type"); // is this a 'byte' or a 'text' cell ?
 			lastHoverType = type;
-			var byteCell = (type == 'byte') ? this : this.parentNode.cells[this.cellIndex-16];
+			var byteCell = (type == 'byte') ? elem : elem.parentNode.cells[elem.cellIndex-16];
 
 			var altType = (type == 'byte') ? 'text' : 'byte';
 			var altOffset = (type == 'byte') ? 16 : -16;
@@ -334,8 +339,8 @@ var HexGrid = (function(){
 				}
 			}]);
 
-			this.className = type+' highlight';
-			this.parentNode.cells[this.cellIndex+altOffset].className = altType+" highlight";
+			elem.className = type+' highlight';
+			elem.parentNode.cells[elem.cellIndex+altOffset].className = altType+" highlight";
 
 			if(!selectionInProgress()) {
 				return false;
@@ -345,8 +350,10 @@ var HexGrid = (function(){
 		}
 
 		function byteMouseOutHandler() {
-			var type = this.getAttribute("_type"); // is this a 'byte' or a 'text' cell ?
-			var byteCell = (type == 'byte') ? this : this.parentNode.cells[this.cellIndex-16];
+			var elem = this;
+
+			var type = elem.getAttribute("_type"); // is this a 'byte' or a 'text' cell ?
+			var byteCell = (type == 'byte') ? elem : elem.parentNode.cells[elem.cellIndex-16];
 
 			/// TODO check closure compiler DOCS
 			/// for some reason dot notation does not work with ADVANCED_COMPILATION mode 
@@ -481,7 +488,9 @@ var HexGrid = (function(){
 		var scrollPixelsPerLine = lowestOffset/lowestScrollPoint;
 
 		function scrollHandler() {
-			var scrollLine = Math.ceil((scrollPixelsPerLine*this.scrollTop)/16);
+			var scrollerElem = this;
+
+			var scrollLine = Math.ceil((scrollPixelsPerLine*scrollerElem.scrollTop)/16);
 			showFromLine(scrollLine,true);
 		}
 
@@ -570,14 +579,14 @@ var HexGrid = (function(){
 		    	var buffer = new Uint8Array(rawbuffer);
 
 				for(var x = 0; x < byteMap.length; x++) {
-					if(buffer[x] == undefined) {
+					if(buffer[x] === undefined) {
 						byteMap[x].nodeValue = "  ";
 						charMap[x].nodeValue = " "
 						continue;
 					}
 
 					// update address value
-					if((x % 16) == 0) {
+					if((x % 16) === 0) {
 						var lineNum = x / 16;
 						addrMap[lineNum].nodeValue = getPosStr(x+offset);
 					}
