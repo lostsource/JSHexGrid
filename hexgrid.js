@@ -33,8 +33,6 @@ var HexGrid = (function(){
 		}
 
 		this.getLength = function() {
-			/// TODO check closure compiler DOCS
-			/// for some reason dot notation does not work with ADVANCED_COMPILATION mode 
 			if(!this.exists()) {
 				return false;
 			}
@@ -47,9 +45,6 @@ var HexGrid = (function(){
 		}
 
 		this.hasAddress = function(adr) {
-			/// TODO check closure compiler DOCS
-			/// for some reason dot notation does not work with ADVANCED_COMPILATION mode 
-
 			if(!this.exists()) {
 				return false;
 			}
@@ -70,9 +65,6 @@ var HexGrid = (function(){
 
 		// selection id consists of selectionStart:selectionLength
 		this.getId = function() {
-			/// TODO check closure compiler DOCS
-			/// for some reason dot notation does not work with ADVANCED_COMPILATION mode 
-
 			return this.getStart()+":"+((this.getStop() - this.getStart())+1);
 		}
 
@@ -89,8 +81,7 @@ var HexGrid = (function(){
 		}
 
 		function _onbeforechange() {
-			/// TODO check closure compiler DOCS
-			/// for some reason dot notation does not work with ADVANCED_COMPILATION mode 
+			
 			oldSelection = new GridSelection(that.getStart(),that.getStop());
 
 			if(typeof(that.onbeforechange) == "function") {
@@ -185,8 +176,7 @@ var HexGrid = (function(){
 		}
 
 		function updateSelectionDisplay() {
-			/// TODO check closure compiler DOCS
-			/// for some reason dot notation does not work with ADVANCED_COMPILATION mode 
+			
 			if(!selection.exists()) {
 				return false;
 			}
@@ -355,8 +345,7 @@ var HexGrid = (function(){
 			var type = elem.getAttribute("_type"); // is this a 'byte' or a 'text' cell ?
 			var byteCell = (type == 'byte') ? elem : elem.parentNode.cells[elem.cellIndex-16];
 
-			/// TODO check closure compiler DOCS
-			/// for some reason dot notation does not work with ADVANCED_COMPILATION mode 
+			
 
 			if(!selection.hasAddress(getByteCellAddress(byteCell))) {
 				byteCell.className = "byte";
@@ -448,7 +437,6 @@ var HexGrid = (function(){
 		var gridHeight = tbl.offsetHeight;
 		var tblWidth = tbl.offsetWidth;
 
-
 		userContainer.removeChild(tbl);
 		tbl.style.visibility = "visible";
 
@@ -458,8 +446,6 @@ var HexGrid = (function(){
 		scroller.style.position = "absolute";
 		scroller.style.top = "0px";
 		scroller.style.left = "0px";
-
-
 
 		// inner div is not visible but its height is set 
 		// to predict height of all data lines
@@ -528,7 +514,6 @@ var HexGrid = (function(){
 
 			return str.toUpperCase();
 		}
-
 
 		/**
 		 * @param {...number} offset
@@ -626,7 +611,6 @@ var HexGrid = (function(){
 
 			return (totalLines-rowTotal)*16;
 		}
-
 
 		/**
 		 * Scroll Control
@@ -730,7 +714,6 @@ var HexGrid = (function(){
 			return selection.inProgress;
 		}
 
-
 		return {
 			"render": function() {
 				userContainer.appendChild(outer);
@@ -784,8 +767,4 @@ var HexGrid = (function(){
 			}
 		}
 	}
-
-
-
 })();
-
