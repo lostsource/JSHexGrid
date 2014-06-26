@@ -517,7 +517,7 @@ var HexGrid = (function(){
 
 		/**
 		 * @param {...number} offset
-	 	*/
+		*/
 
 		function showFrom(offset) {
 			var viascroll = arguments[1];
@@ -547,21 +547,21 @@ var HexGrid = (function(){
 				// move to last possible offset
 				offset = getLastOffset();
 			}
-	    	var reader = new FileReader();	
+			var reader = new FileReader();	
 
 			var stopAddress = offset+(rowTotal*16);
 
 			// we retrieve 7 extra bytes for possible external use
 			// when showing value information (as they may depend 
-		    // on values out of current view)
+			// on values out of current view)
 			stopAddress += 7;
 
 			var blob = file.slice(offset,stopAddress);
-		    reader.onload = function(e){
-		    	var rawbuffer = e.target.result;
+			reader.onload = function(e){
+				var rawbuffer = e.target.result;
 				curBuffer = rawbuffer;
 
-		    	var buffer = new Uint8Array(rawbuffer);
+				var buffer = new Uint8Array(rawbuffer);
 
 				for(var x = 0; x < byteMap.length; x++) {
 					if(buffer[x] === undefined) {
@@ -598,9 +598,9 @@ var HexGrid = (function(){
 					scroller.scrollTop = Math.floor((curOffset/16)/linesPerPixel);
 				}
 
-		    }
+			}
 
-		    reader.readAsArrayBuffer(blob);
+			reader.readAsArrayBuffer(blob);
 		}
 
 		// returns last possible offset before overrun 
@@ -668,26 +668,26 @@ var HexGrid = (function(){
 		// returns width of scrollbar in pixels (which may vary between browsers)
 		// used to accurately calculate width of elements in order to create 'fake' scroller
 		function getScrollbarWidth() {
-		    var outer = document.createElement("div");
-		    outer.style.visibility = "hidden";
-		    outer.style.width = "100px";
-		    document.body.appendChild(outer);
+			var outer = document.createElement("div");
+			outer.style.visibility = "hidden";
+			outer.style.width = "100px";
+			document.body.appendChild(outer);
 
-		    var widthNoScroll = outer.offsetWidth;
-		    // force scrollbars
-		    outer.style.overflow = "scroll";
+			var widthNoScroll = outer.offsetWidth;
+			// force scrollbars
+			outer.style.overflow = "scroll";
 
-		    // add innerdiv
-		    var inner = document.createElement("div");
-		    inner.style.width = "100%";
-		    outer.appendChild(inner);        
+			// add innerdiv
+			var inner = document.createElement("div");
+			inner.style.width = "100%";
+			outer.appendChild(inner);        
 
-		    var widthWithScroll = inner.offsetWidth;
+			var widthWithScroll = inner.offsetWidth;
 
-		    // remove divs
-		    outer.parentNode.removeChild(outer);
+			// remove divs
+			outer.parentNode.removeChild(outer);
 
-		    return widthNoScroll - widthWithScroll;
+			return widthNoScroll - widthWithScroll;
 		}
 
 		// returns byte index relative to grid.. 0-255
