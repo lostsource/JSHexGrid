@@ -124,19 +124,11 @@ var HexGrid = (function(){
 			}
 		},
 
-
-		// Grid Contsructor
 		grid: function(gridOpts) {
     		var rowTotal = (typeof(gridOpts.rows) === "undefined") ? 16 : parseInt(gridOpts.rows,10);
-			var file = gridOpts.file;
 			var userContainer = gridOpts.container;
 			var preselect = gridOpts.selection;
-			
 			var dataSrc = gridOpts.dataSrc;
-
-			if(!file) {
-				return false;
-			}
 
 			var that = this;
 			var curOffset = 0;
