@@ -98,6 +98,32 @@ var HexGrid = (function(){
 
 
 	return {
+		dataHandler: {
+			file: function(file) {
+				return new (function(){
+					this.getSize = function() {
+						return file.size;
+					}
+
+					this.getByteArray = function(start,end,callback) { 
+						callback = callback || function() {};
+
+						var reader = new FileReader();	
+						var blob = file.slice(start,end);
+
+						reader.onload = function(e){
+							var rawbuffer = e.target.result;
+							var buffer = new Uint8Array(rawbuffer);
+							callback(buffer);
+						}
+
+	
+						reader.readAsArrayBuffer(blob);
+					}
+				})();
+			}
+		},
+
 
 		// Grid Contsructor
 		grid: function(gridOpts) {
@@ -106,6 +132,8 @@ var HexGrid = (function(){
 			var userContainer = gridOpts.container;
 			var preselect = gridOpts.selection;
 			
+			var dataSrc = gridOpts.dataSrc;
+
 			if(!file) {
 				return false;
 			}
@@ -432,7 +460,7 @@ var HexGrid = (function(){
 				}		
 			}
 
-			var totalLines = Math.ceil(file.size/16);
+			var totalLines = Math.ceil(dataSrc.getSize()/16);
 
 			// calculate height of 16 lines so we know height of 1 line
 			// table must be temporary appended (visibility hidden)
@@ -550,7 +578,7 @@ var HexGrid = (function(){
 				}
 
 
-				if((offset+(rowTotal*16)) > file.size) {
+				if((offset+(rowTotal*16)) > dataSrc.getSize()) {
 					// offset overrun
 					// move to last possible offset
 					offset = getLastOffset();
@@ -564,15 +592,11 @@ var HexGrid = (function(){
 				// on values out of current view)
 				stopAddress += 7;
 
-				var blob = file.slice(offset,stopAddress);
-				reader.onload = function(e){
-					var rawbuffer = e.target.result;
-					curBuffer = rawbuffer;
-
-					var buffer = new Uint8Array(rawbuffer);
+				dataSrc.getByteArray(offset,stopAddress,function(byteArr){
+					curBuffer = byteArr.buffer;
 
 					for(var x = 0; x < byteMap.length; x++) {
-						if(buffer[x] === undefined) {
+						if(byteArr[x] === undefined) {
 							byteMap[x].nodeValue = "  ";
 							charMap[x].nodeValue = " "
 							continue;
@@ -584,9 +608,9 @@ var HexGrid = (function(){
 							addrMap[lineNum].nodeValue = getPosStr(x+offset);
 						}
 
-						byteMap[x].nodeValue = getByteStr(buffer[x]);
-						charMap[x].nodeValue = (invisibleChars.indexOf(buffer[x]) == -1) ? 
-								String.fromCharCode(buffer[x]) : ".";
+						byteMap[x].nodeValue = getByteStr(byteArr[x]);
+						charMap[x].nodeValue = (invisibleChars.indexOf(byteArr[x]) == -1) ? 
+								String.fromCharCode(byteArr[x]) : ".";
 					}
 
 					curOffset = offset;
@@ -605,10 +629,7 @@ var HexGrid = (function(){
 						};
 						scroller.scrollTop = Math.floor((curOffset/16)/linesPerPixel);
 					}
-
-				}
-
-				reader.readAsArrayBuffer(blob);
+				});
 			}
 
 			// returns last possible offset before overrun 
@@ -711,7 +732,7 @@ var HexGrid = (function(){
 				var cellOffset = getByteCellIndex(td);
 
 				var addrOffset = curOffset+cellOffset;
-				if(addrOffset >= file.size) {
+				if(addrOffset >= dataSrc.getSize()) {
 					return false;
 				}
 
