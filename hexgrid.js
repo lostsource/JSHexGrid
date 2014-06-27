@@ -723,54 +723,54 @@ var HexGrid = (function(){
 			}
 
 			return {
-				"render": function() {
+				render: function() {
 					userContainer.appendChild(outer);
 					outer.setAttribute("tabindex","1");
 					outer.style.outline = "none";
 					outer.focus();
 					return outer;
 				},
-				"getDimensions": function() {
+				getDimensions: function() {
 					return {
-						"height": gridHeight,
-						"width":  (tblWidth+scrollBarWidth),
-						"row": {
-							"height": lineHeight,
-							"count": rowTotal
+						height: gridHeight,
+						width:  (tblWidth+scrollBarWidth),
+						row: {
+							height: lineHeight,
+							count: rowTotal
 						}
 					}
 				},
-				"getElementsByIndex": function(ndx) {
+				getElementsByIndex: function(ndx) {
 					if((!byteMap[ndx]) || (!charMap[ndx])) {
 						return false;
 					}
 
 					return {
-						"byte": byteMap[ndx].parentNode,
-						"char": charMap[ndx].parentNode
+						byte: byteMap[ndx].parentNode,
+						char: charMap[ndx].parentNode
 					};
 				},
 				getLastHoverType: function() {
 					return lastHoverType;
 				},
-				"getOffset": function() {
+				getOffset: function() {
 					return curOffset;
 				},
-				"getSize": function() {
+				getSize: function() {
 					return (rowTotal*16);
 				},
-				"getBuffer": function() {
+				getBuffer: function() {
 					return curBuffer;
 				},
-				"getSelection": function() {
+				getSelection: function() {
 					return selection;
 				},
-				"showFrom": showFrom,
-				"scrollBy": scrollBy,
-				"scrollByPage": scrollByPage,
-				"scrollToTop": scrollToTop,
-				"scrollToBottom": scrollToBottom,
-				"on": function(evName,evCallback) {
+				showFrom: showFrom,
+				scrollBy: scrollBy,
+				scrollByPage: scrollByPage,
+				scrollToTop: scrollToTop,
+				scrollToBottom: scrollToBottom,
+				on: function(evName,evCallback) {
 					evHandlers[evName] = evCallback;
 				}
 			}
