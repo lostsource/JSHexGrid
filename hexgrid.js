@@ -243,6 +243,8 @@ var HexGrid = (function(){
 			var invisibleChars = getInvisibleAsciiCodes();
 
 			var outer = document.createElement("div");
+			outer.onselectstart = function() { return false; };
+			outer.style.cursor = 'default';
 			outer.onkeydown = function(e) {
 				switch(e.keyCode) {
 					case 36: // home
