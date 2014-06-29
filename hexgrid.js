@@ -298,11 +298,14 @@ var HexGrid = (function(){
 			var evHandlers = {};
 
 			function emitEvent(evName,evArgs) {
-				if(typeof(evHandlers[evName]) != "function") {
+				if(typeof(evHandlers[evName]) != "object") {
 					return false;
 				}
 
-				evHandlers[evName].apply(that,evArgs);
+				var events = evHandlers[evName];
+				for(var x = 0; x < events.length; x++) {
+					events[x].apply(that,evArgs);
+				}
 			}
 
 			function wheelHandler(e) {
@@ -893,7 +896,8 @@ var HexGrid = (function(){
 				scrollToTop: scrollToTop,
 				scrollToBottom: scrollToBottom,
 				on: function(evName,evCallback) {
-					evHandlers[evName] = evCallback;
+      				evHandlers[evName] = evHandlers[evName] || [];
+      				evHandlers[evName].push(evCallback);
 				}
 			}
 		}
