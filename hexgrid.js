@@ -96,6 +96,9 @@ var HexGrid = (function(){
 		}
 	}
 
+	function getDefaultColors() {
+		return { selection: '#eeeeee', hover: '#cccccc', background: 'white'}		
+	}
 
 	return {
 		dataHandler: {
@@ -124,11 +127,32 @@ var HexGrid = (function(){
 			}
 		},
 
+		theme: {
+			default: getDefaultColors(),
+			dark: {
+				foreground: 'white',
+				background: '#272822',
+				address: '#66d9ef',
+				text: '#e6db74',
+				hover: '#444444',
+				selection: '#4b2d2d'
+			},
+			light: {
+				background: '#e8eaf2',
+				foreground: 'black',
+				address: '#870d3d',
+				text: '#0b6125',
+				hover: '#eeeeee',
+				selection: '#b9cafa'
+			}
+		},
+
 		grid: function(gridOpts) {
     		var rowTotal = (typeof(gridOpts.rows) === "undefined") ? 16 : parseInt(gridOpts.rows,10);
 			var userContainer = gridOpts.container;
 			var preselect = gridOpts.selection;
 			var dataSrc = gridOpts.dataSrc;
+			var gridColors = gridOpts.colors || {};
 
 			var that = this;
 			var curOffset = 0;
@@ -198,8 +222,9 @@ var HexGrid = (function(){
 					byteTd = byteMap[x].parentNode;
 					charTd = charMap[x].parentNode;
 					byteOffset = curOffset + x;
-					byteTd.className = "byte";
-					charTd.className = "text";
+
+					setByteElemDefault(byteTd);
+					setTextElemDefault(charTd);
 				}
 			}
 
@@ -226,12 +251,12 @@ var HexGrid = (function(){
 					byteOffset = curOffset + x;
 
 					if((byteOffset >= start) && (byteOffset <= stop)) {
-						byteTd.className = "byte selected";
-						charTd.className = "text selected";
+						setByteElemSelected(byteTd);
+						setTextElemSelected(charTd);
 					}
 					else {
-						byteTd.className = "byte";
-						charTd.className = "text";
+						setByteElemDefault(byteTd);
+						setTextElemDefault(charTd);
 					}
 				}
 			}
@@ -359,8 +384,14 @@ var HexGrid = (function(){
 					}
 				}]);
 
+				// changes color of current item being hovered
 				elem.className = type+' highlight';
 				elem.parentNode.cells[elem.cellIndex+altOffset].className = altType+" highlight";
+
+				if(gridColors.hover) {
+					elem.style.backgroundColor = gridColors.hover;
+					elem.parentNode.cells[elem.cellIndex+altOffset].style.backgroundColor = gridColors.hover;
+				}
 
 				if(!selectionInProgress()) {
 					return false;
@@ -369,24 +400,76 @@ var HexGrid = (function(){
 				selection.setStop(adr);
 			}
 
+			function setByteElemDefault(elem) {
+				if(gridColors.hover) {
+					elem.style.backgroundColor = "";
+				}
+
+				elem.className = "byte";				
+			}
+
+			function setByteElemSelected(elem) {
+				if(gridColors.hover) {
+					elem.style.backgroundColor = "";
+				}
+
+				if(gridColors.selection) {
+					elem.style.backgroundColor = gridColors.selection;
+				}
+
+				elem.className = "byte selected";				
+			}			
+
+			function setTextElemDefault(elem) {
+				if(gridColors.hover) {
+					elem.style.backgroundColor = "";
+				}
+
+				if(gridColors.text) {
+					elem.style.color = gridColors.text;
+				}
+
+				elem.className = "text";
+			}
+
+			function setTextElemSelected(elem) {
+				if(gridColors.hover) {
+					elem.style.backgroundColor = "";
+				}
+
+				if(gridColors.selection) {
+					elem.style.backgroundColor = gridColors.selection;
+				}
+
+
+				elem.className = "text selected"				
+			}
+
+			function setByteStyleDefault(elem) {
+				setByteElemDefault(elem);
+				setTextElemDefault(elem.parentNode.cells[elem.cellIndex+16]);
+			}
+
+			function setByteStyleSelected(elem) {
+				setByteElemSelected(elem);
+				setTextElemSelected(elem.parentNode.cells[elem.cellIndex+16]);
+			}
+
 			function byteMouseOutHandler() {
 				var elem = this;
 
 				var type = elem.getAttribute("_type"); // is this a 'byte' or a 'text' cell ?
 				var byteCell = (type == 'byte') ? elem : elem.parentNode.cells[elem.cellIndex-16];
-
-				
+	
 
 				if(!selection.hasAddress(getByteCellAddress(byteCell))) {
-					byteCell.className = "byte";
-					byteCell.parentNode.cells[byteCell.cellIndex+16].className = "text";
+					setByteStyleDefault(byteCell);
 				}
 				else {
-					byteCell.className = "byte selected";
-					byteCell.parentNode.cells[byteCell.cellIndex+16].className = "text selected";
+					setByteStyleSelected(byteCell);
 				}
 
-				emitEvent("bytehover",[false]);
+				emitEvent("byteout");
 			}
 
 			outer.addEventListener("mousewheel",wheelHandler,false); // chrome / ie
@@ -396,9 +479,18 @@ var HexGrid = (function(){
 
 			var x;
 			var tbl = document.createElement("table");
-			tbl.className = "hexgrid";
+			if(gridColors.background) {
+				tbl.style.backgroundColor = gridColors.background;
+			}
+
+			if(gridColors.foreground) {
+				tbl.style.color = gridColors.foreground;
+			}
+			
+
 			tbl.setAttribute("cellpadding","0");
 			tbl.setAttribute("cellspacing","0");
+
 
 			tbl.style.fontFamily = "monospace";
 			tbl.style.fontSize = "14px";
@@ -409,6 +501,10 @@ var HexGrid = (function(){
 				var row = tbl.insertRow(r);
 				var adr = row.insertCell(-1);
 				adr.className = 'address';
+
+				if(gridColors.address) {
+					adr.style.color = gridColors.address;
+				}
 
 				var adrValue = document.createTextNode(getSpaces(8));
 				addrMap.push(adrValue)
@@ -428,6 +524,15 @@ var HexGrid = (function(){
 					tdByte.addEventListener("mouseout",byteMouseOutHandler,false);
 
 					tdByte.className = 'byte';
+					tdByte.style.textTransform = "uppercase";
+					tdByte.style.paddingLeft = "4px";
+					tdByte.style.paddingRight = "4px";
+					setByteElemDefault(tdByte);
+
+					if((x == 7) || (x == 15)) {
+						tdByte.style.setProperty('border-right',"12px solid "+(gridColors.background || "transparent"),"important");
+					}
+
 					tdByte.setAttribute("_type","byte");
 
 					byteValue = document.createTextNode(getSpaces(2));
@@ -447,6 +552,8 @@ var HexGrid = (function(){
 					tdChar.addEventListener("mouseout",byteMouseOutHandler,false);
 
 					tdChar.className = 'text';
+					setTextElemDefault(tdChar);
+
 					tdChar.setAttribute("_type","char");
 					charValue = document.createTextNode(getSpaces(1));
 					charMap.push(charValue);
