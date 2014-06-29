@@ -1,6 +1,6 @@
 "use strict";
 
-var HexGrid = (function(){
+var JSHexGrid = (function(){
 
 	function GridSelection(start) {
 		var stop = arguments[1];
@@ -381,10 +381,8 @@ var HexGrid = (function(){
 				}
 
 				emitEvent("bytehover",[{
-					offset: {
-						"address": adr,
-						"byte": cellIndex
-					}
+					"absolute": adr,
+					"relative": cellIndex
 				}]);
 
 				// changes color of current item being hovered
