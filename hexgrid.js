@@ -68,7 +68,7 @@ var JSHexGrid = (function(){
 			return this.getStart()+":"+((this.getStop() - this.getStart())+1);
 		}
 
-		this.setInProgress = function(val) {
+		this._setInProgress = function(val) {
 			// switch start/stop so that start is never bigger then stop
 			if(start > stop) {
 				var tmpStop = stop;
@@ -342,7 +342,7 @@ var JSHexGrid = (function(){
 				}
 
 				if(e.button === 0) {
-					selection.setInProgress(true);
+					selection._setInProgress(true);
 					selection.setStart(adr);
 					selection.setStop(adr);
 				}
@@ -361,7 +361,7 @@ var JSHexGrid = (function(){
 					return false;
 				}
 
-				selection.setInProgress(false);
+				selection._setInProgress(false);
 			}
 
 			function byteMouseOverHandler() {
