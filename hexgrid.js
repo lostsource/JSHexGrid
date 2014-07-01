@@ -336,8 +336,8 @@ var JSHexGrid = (function(){
 
 				if(e.button == 2) { // right click
 					emitEvent("bytecontext",[{
-						address: adr,
-						index: byteIndex
+						absolute: adr,
+						relative: byteIndex
 					}]);
 				}
 
