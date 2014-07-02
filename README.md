@@ -22,6 +22,10 @@ JSHexGrid can be initialized by using the `grid` constructor. Parameters are pas
         
         dataSrc:    // This should contain a DataHandler object described below
         (required)  
+
+        colors:     // set colors of grid based on passed object
+                    // built in themes are available
+                    // JSHexGrid.theme.default, JSHexGrid.theme.dark, JSHexGrid.theme.light
     });
 
 **DataHandler**
