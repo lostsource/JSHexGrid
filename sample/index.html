@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<title>JSHexGrid Sample</title>
+<head>	
+<script type='text/javascript' src='../hexgrid.js'></script>
+<script type='text/javascript'>
+
+window.onload = function() {
+	document.getElementById('sourcefile').addEventListener('change', handleFileSelect, false);
+}
+
+var Grid; // intentionally left in global namespace for analysis in Chrome dev tools etc..
+
+function handleFileSelect(e) {
+	var dataSource = e.target || e.dataTransfer;
+	var container = document.getElementById('grid');
+
+
+    var file = dataSource.files[0]; // FileList object
+	Grid = new JSHexGrid.grid({
+		rows: 16,
+		container: container,
+		dataSrc: JSHexGrid.dataHandler.file(file),
+		colors: JSHexGrid.theme.default
+	});
+
+	if(Grid) {
+		var dimensions = Grid.getDimensions();
+
+		container.innerHTML = "";
+		container.style.width = dimensions.width+"px";
+		container.style.height = dimensions.height+"px";
+		container.style.margin = "0 auto";
+		container.style.display = "";
+		container.style.overflow = "hidden";
+
+		Grid.render();
+
+		Grid.showFrom(0);
+
+		
+	}
+  }
+
+</script>
+</head>
+<body>
+<div style='width:200px; margin:10px auto;'>
+	<input type="file" id="sourcefile" name="sourcefile"/>
+</div>
+<div id='grid'></div>	
+</body>
+</html>
