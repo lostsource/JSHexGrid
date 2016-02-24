@@ -158,11 +158,13 @@ var JSHexGrid = (function(){
 		},
 
 		grid: function(gridOpts) {
-    		var rowTotal = (typeof(gridOpts.rows) === "undefined") ? 16 : parseInt(gridOpts.rows,10);
+			var rowTotal = (typeof(gridOpts.rows) === "undefined") ? 16 : parseInt(gridOpts.rows,10);
 			var userContainer = gridOpts.container;
 			var preselect = gridOpts.selection;
 			var dataSrc = gridOpts.dataSrc;
 			var gridColors = gridOpts.colors || {};
+			var gridCols = (typeof(gridOpts.cols) === "undefined") ? 16 : parseInt(gridOpts.cols,10);
+			var gridInterval = (typeof(gridOpts.interval) === "undefined") ? 8 : parseInt(gridOpts.interval,10);
 
 			var that = this;
 			var curOffset = 0;
@@ -194,7 +196,7 @@ var JSHexGrid = (function(){
 			}
 
 			function getGridSize() {
-				return (rowTotal*16);
+				return (rowTotal*gridCols);
 			}
 
 			function isRangeInView(start,stop) {
@@ -335,7 +337,7 @@ var JSHexGrid = (function(){
 				var elem = this;
 
 				var type = elem.getAttribute("_type"); // is this a 'byte' or a 'text' cell ?
-				var byteCell = (type == 'byte') ? elem : elem.parentNode.cells[elem.cellIndex-16];
+				var byteCell = (type == 'byte') ? elem : elem.parentNode.cells[elem.cellIndex-gridCols];
 
 				var adr = getByteCellAddress(byteCell);
 				if(adr === false) {
@@ -378,10 +380,10 @@ var JSHexGrid = (function(){
 				var elem = this;
 				var type = elem.getAttribute("_type"); // is this a 'byte' or a 'text' cell ?
 				lastHoverType = type;
-				var byteCell = (type == 'byte') ? elem : elem.parentNode.cells[elem.cellIndex-16];
+				var byteCell = (type == 'byte') ? elem : elem.parentNode.cells[elem.cellIndex-gridCols];
 
 				var altType = (type == 'byte') ? 'text' : 'byte';
-				var altOffset = (type == 'byte') ? 16 : -16;
+				var altOffset = (type == 'byte') ? gridCols : -gridCols;
 
 				var adr = getByteCellAddress(byteCell);
 				var cellIndex = getByteCellIndex(byteCell);
@@ -458,19 +460,19 @@ var JSHexGrid = (function(){
 
 			function setByteStyleDefault(elem) {
 				setByteElemDefault(elem);
-				setTextElemDefault(elem.parentNode.cells[elem.cellIndex+16]);
+				setTextElemDefault(elem.parentNode.cells[elem.cellIndex+gridCols]);
 			}
 
 			function setByteStyleSelected(elem) {
 				setByteElemSelected(elem);
-				setTextElemSelected(elem.parentNode.cells[elem.cellIndex+16]);
+				setTextElemSelected(elem.parentNode.cells[elem.cellIndex+gridCols]);
 			}
 
 			function byteMouseOutHandler() {
 				var elem = this;
 
 				var type = elem.getAttribute("_type"); // is this a 'byte' or a 'text' cell ?
-				var byteCell = (type == 'byte') ? elem : elem.parentNode.cells[elem.cellIndex-16];
+				var byteCell = (type == 'byte') ? elem : elem.parentNode.cells[elem.cellIndex-gridCols];
 	
 
 				if(!selection.hasAddress(getByteCellAddress(byteCell))) {
@@ -524,9 +526,9 @@ var JSHexGrid = (function(){
 				adr.style.paddingTop = "2px";
 				adr.style.paddingBottom = "2px";
 
-				// create cells for 16 bytes in line
+				// create cells for #gridCols bytes in line
 				var tdByte,byteValue;
-				for(x = 0; x < 16; x++) {
+				for(x = 0; x < gridCols; x++) {
 					tdByte = row.insertCell(-1);
 					tdByte.addEventListener("click",byteMouseClickHandler,false);
 					tdByte.addEventListener("mousedown",byteMouseDownHandler,false);
@@ -540,7 +542,7 @@ var JSHexGrid = (function(){
 					tdByte.style.paddingRight = "4px";
 					setByteElemDefault(tdByte);
 
-					if((x == 7) || (x == 15)) {
+					if(((x % gridInterval) == (gridInterval-1)) || (x==gridCols-1)) {
 						tdByte.style.setProperty('border-right',"12px solid "+(gridColors.background || "transparent"),"important");
 					}
 
@@ -553,7 +555,7 @@ var JSHexGrid = (function(){
 
 				// create cells for plain text char values
 				var tdChar,charValue;
-				for(x = 0; x < 16; x++) {
+				for(x = 0; x < gridCols; x++) {
 					tdChar = row.insertCell(-1);
 
 					tdChar.addEventListener("click",byteMouseClickHandler,false);
@@ -572,7 +574,7 @@ var JSHexGrid = (function(){
 				}		
 			}
 
-			var totalLines = Math.ceil(dataSrc.getSize()/16);
+			var totalLines = Math.ceil(dataSrc.getSize()/gridCols);
 
 			// calculate height of 16 lines so we know height of 1 line
 			// table must be temporary appended (visibility hidden)
@@ -616,7 +618,7 @@ var JSHexGrid = (function(){
 
 			var lowestScrollPoint = innerPxLen-(gridHeight);
 			var lowestOffset = getLastOffset();
-			var lowestLine = lowestOffset / 16;
+			var lowestLine = lowestOffset / gridCols;
 			var linesPerPixel = lowestLine / lowestScrollPoint;
 
 			var scrollPixelsPerLine = lowestOffset/lowestScrollPoint;
@@ -624,7 +626,7 @@ var JSHexGrid = (function(){
 			function scrollHandler() {
 				var scrollerElem = this;
 
-				var scrollLine = Math.ceil((scrollPixelsPerLine*scrollerElem.scrollTop)/16);
+				var scrollLine = Math.ceil((scrollPixelsPerLine*scrollerElem.scrollTop)/gridCols);
 				showFromLine(scrollLine,true);
 			}
 
@@ -643,7 +645,7 @@ var JSHexGrid = (function(){
 			outer.appendChild(tbl);
 
 			function showFromLine(line,viascroll) {
-				showFrom(line*16,viascroll);
+				showFrom(line*gridCols,viascroll);
 			}
 
 
@@ -685,19 +687,19 @@ var JSHexGrid = (function(){
 
 				var hexOffset = offset.toString(16);
 				var lastHexNum = hexOffset.substr(hexOffset.length-1,1);
-				if(lastHexNum != "0") {
-					offset = parseInt(hexOffset.substr(0,hexOffset.length-1)+"0",16);
-				}
+				//if(lastHexNum != "0") {
+				//	offset = parseInt(hexOffset.substr(0,hexOffset.length-1)+"0",16);
+				//}
 
 
-				if((offset+(rowTotal*16)) > dataSrc.getSize()) {
+				if((offset+(rowTotal*gridCols)) > dataSrc.getSize()) {
 					// offset overrun
 					// move to last possible offset
 					offset = getLastOffset();
 				}
 				var reader = new FileReader();	
 
-				var stopAddress = offset+(rowTotal*16);
+				var stopAddress = offset+(rowTotal*gridCols);
 
 				// we retrieve 7 extra bytes for possible external use
 				// when showing value information (as they may depend 
@@ -715,8 +717,8 @@ var JSHexGrid = (function(){
 						}
 
 						// update address value
-						if((x % 16) === 0) {
-							var lineNum = x / 16;
+						if((x % gridCols) === 0) {
+							var lineNum = x / gridCols;
 							addrMap[lineNum].nodeValue = getPosStr(x+offset);
 						}
 
@@ -739,7 +741,7 @@ var JSHexGrid = (function(){
 						scroller.onscroll = function(){
 							this.onscroll = scrollHandler;
 						};
-						scroller.scrollTop = Math.floor((curOffset/16)/linesPerPixel);
+						scroller.scrollTop = Math.floor((curOffset/gridCols)/linesPerPixel);
 					}
 				});
 			}
@@ -750,7 +752,7 @@ var JSHexGrid = (function(){
 					return 0;
 				}
 
-				return (totalLines-rowTotal)*16;
+				return (totalLines-rowTotal)*gridCols;
 			}
 
 			/**
@@ -759,13 +761,13 @@ var JSHexGrid = (function(){
 			function scrollBy(lineCount) {
 				lineCount = parseInt(lineCount,10)
 
-				var newOffset = curOffset + (lineCount*16);
+				var newOffset = curOffset + (lineCount*gridCols);
 				showFrom(newOffset);
 			}
 
 			function scrollByPage(pageCount) {
 				var newOffset;
-				newOffset = curOffset + (rowTotal*16)*pageCount;
+				newOffset = curOffset + (rowTotal*gridCols)*pageCount;
 				showFrom(newOffset);
 			}
 
@@ -836,7 +838,7 @@ var JSHexGrid = (function(){
 				var rowIndex = td.parentNode.rowIndex;
 				var cellIndex = td.cellIndex - 1; // -1 to compensate for address cell
 				
-				return (rowIndex*16)+cellIndex;
+				return (rowIndex*gridCols)+cellIndex;
 			}
 
 			// returns absolute file address of byte in supplied cell.. 0-Total Bytes
@@ -890,7 +892,7 @@ var JSHexGrid = (function(){
 					return curOffset;
 				},
 				getSize: function() {
-					return (rowTotal*16);
+					return (rowTotal*gridCols);
 				},
 				getBuffer: function() {
 					return curBuffer;
