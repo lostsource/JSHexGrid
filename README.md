@@ -15,8 +15,13 @@ JSHexGrid can be initialized by using the `grid` constructor. Parameters are pas
     var Grid = new JSHexGrid.grid({
         rows:       // Number of rows to display in grid. 
         (required)  // eg. 16
-                
-                    
+
+        cols:       // Number of columns to display in the grid.
+                    // Default is 16
+
+        interval:   // Size of the column grouping (i.e. how many columns before an extra space is inserted)
+                    // Default is 8
+
         container:  // Calling Grid.render will append grid to this element
         (required)  // eg. document.getElementById('myGrid')
         
