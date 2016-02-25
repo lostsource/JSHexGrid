@@ -165,7 +165,7 @@ var JSHexGrid = (function(){
 			var gridColors = gridOpts.colors || {};
 			var gridCols = (typeof(gridOpts.cols) === "undefined") ? 16 : parseInt(gridOpts.cols,10);
 			var gridInterval = (typeof(gridOpts.interval) === "undefined") ? 8 : parseInt(gridOpts.interval,10);
-			var gridAligned = (typeof(gridOpts.aligned) === "undefined") ? gridOpts.aligned : true;
+			var gridAligned = (typeof(gridOpts.aligned) === "undefined") ? true : gridOpts.aligned;
 
 			var that = this;
 			var curOffset = 0;
