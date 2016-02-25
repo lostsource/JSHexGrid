@@ -165,6 +165,7 @@ var JSHexGrid = (function(){
 			var gridColors = gridOpts.colors || {};
 			var gridCols = (typeof(gridOpts.cols) === "undefined") ? 16 : parseInt(gridOpts.cols,10);
 			var gridInterval = (typeof(gridOpts.interval) === "undefined") ? 8 : parseInt(gridOpts.interval,10);
+			var gridAligned = (typeof(gridOpts.aligned) === "undefined") ? gridOpts.aligned : true;
 
 			var that = this;
 			var curOffset = 0;
@@ -685,11 +686,10 @@ var JSHexGrid = (function(){
 				// if it isnt we subtract from offset until we find
 				// a valid offset
 
-				var hexOffset = offset.toString(16);
-				var lastHexNum = hexOffset.substr(hexOffset.length-1,1);
-				//if(lastHexNum != "0") {
-				//	offset = parseInt(hexOffset.substr(0,hexOffset.length-1)+"0",16);
-				//}
+				if (gridAligned) {
+					offset = Math.floor(offset / gridCols) * gridCols;
+				}
+
 
 
 				if((offset+(rowTotal*gridCols)) > dataSrc.getSize()) {
